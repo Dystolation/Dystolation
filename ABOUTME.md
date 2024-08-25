@@ -1,0 +1,7 @@
+- 👋 Hi, I’m @Dystolation
+- 👀 I’m interested in making Roblox Games!
+- 🌱 I’m currently learning lua scripting as it is the main languague for Roblox Studio
+- 💞️ I’m looking to collaborate on no one for now
+- 📫 How to reach me; Comment on my youtube channel!
+- 😄 Pronouns: idk
+- ⚡ Fun fact: I have a fun fact
