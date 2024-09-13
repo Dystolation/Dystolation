@@ -1,105 +1,100 @@
-local pet = {
-    name = "Buddy",
-    hunger = 50,
-    happiness = 50,
-    energy = 50,
-    age = 0,
-    alive = true
-}
+local minValue = 1 -- Sets the minimum value for the random number range
+local maxValue = 100 -- Sets the maximum value for the random number range
+local attempts = 0 -- Initializes attempts counter to zero
+local targetNumber = 0 -- Placeholder for the randomly generated target number
+local maxAttempts = 5 -- The maximum number of attempts allowed
+local gameOver = false -- Boolean to track if the game has ended
 
-print("Welcome to the Virtual Pet Simulator!")
-print("Your pet's name is " .. pet.name .. ".")
-
-local function showStats()
-    print("\n-- Current Stats --")
-    print("Hunger: " .. pet.hunger)
-    print("Happiness: " .. pet.happiness)
-    print("Energy: " .. pet.energy)
-    print("Age: " .. pet.age .. " days")
+function startGame() -- Defines the function to start the game
+    print("Welcome to the RNG Game!") -- Prints a welcome message
+    print("Guess the number between " .. minValue .. " and " .. maxValue .. "!") -- Concatenates and prints the min and max range
+    targetNumber = math.random(minValue, maxValue) -- Generates a random number between minValue and maxValue
+    attempts = 0 -- Resets the attempt counter to zero
+    gameOver = false -- Resets the gameOver state to false
+    print("You have " .. maxAttempts .. " attempts to guess the number!") -- Informs player of the number of attempts available
 end
 
-local function feedPet()
-    if pet.hunger > 10 then
-        pet.hunger = pet.hunger - 10
-        pet.happiness = pet.happiness + 5
-        print(pet.name .. " enjoyed the food!")
+function guessNumber(playerGuess) -- Function to process the player's guess
+    if gameOver then -- Checks if the game is already over
+        print("Game over! Please restart.") -- Prints game over message if game is already finished
+        return -- Stops the function from proceeding further
+    end
+
+    attempts = attempts + 1 -- Increments the attempts counter by 1
+
+    if playerGuess == targetNumber then -- Checks if the player's guess matches the target number
+        print("Congratulations! You've guessed the correct number!") -- Informs player of success if they guessed correctly
+        gameOver = true -- Sets gameOver to true since the player won
+    elseif playerGuess < targetNumber then -- If the guess is lower than the target number
+        print("Your guess is too low!") -- Informs the player that their guess is too low
+    else -- If the guess is higher than the target number
+        print("Your guess is too high!") -- Informs the player that their guess is too high
+    end
+
+    if attempts >= maxAttempts then -- Checks if the player has reached the maximum number of attempts
+        gameOver = true -- Ends the game if the player used all attempts
+        print("You've used all your attempts! The correct number was " .. targetNumber .. ".") -- Reveals the correct number after all attempts are used
+    end
+end
+
+function resetGame() -- Defines a function to reset the game
+    print("Resetting the game...") -- Informs the player that the game is resetting
+    startGame() -- Calls the startGame function to begin a new game
+end
+
+-- Main loop for game simulation
+startGame() -- Starts the game when the script runs
+
+-- Example guesses below. You can replace these with user input in real use case.
+guessNumber(50) -- Simulates a player guessing 50
+guessNumber(75) -- Simulates a player guessing 75
+guessNumber(88) -- Simulates a player guessing 88
+guessNumber(92) -- Simulates a player guessing 92
+guessNumber(99) -- Simulates a player guessing 99
+
+-- Game control and decision logic
+if gameOver then -- If the game is over
+    print("Do you want to play again? (y/n)") -- Asks the player if they want to play again
+    local playerInput = "y" -- Simulates the player inputting 'y'
+    if playerInput == "y" then -- Checks if the player chose to play again
+        resetGame() -- Resets the game if they chose to play again
     else
-        print(pet.name .. " is not hungry right now.")
+        print("Thanks for playing!") -- Thanks the player and ends the game
     end
+else
+    print("The game is still in progress...") -- Informs the player that the game is still going
 end
 
-local function playWithPet()
-    if pet.energy > 20 then
-        pet.happiness = pet.happiness + 10
-        pet.energy = pet.energy - 20
-        print(pet.name .. " had a great time playing!")
-    else
-        print(pet.name .. " is too tired to play.")
-    end
+-- More test cases for player guesses
+guessNumber(5) -- Simulates a guess of 5
+guessNumber(10) -- Simulates a guess of 10
+guessNumber(15) -- Simulates a guess of 15
+guessNumber(20) -- Simulates a guess of 20
+
+-- Check game state again
+if gameOver then -- If game is over after these guesses
+    print("Game ended!") -- Prints that the game has ended
+else
+    print("Still going... Keep guessing!") -- Encourages the player to keep guessing
 end
 
-local function restPet()
-    pet.energy = pet.energy + 30
-    if pet.energy > 100 then
-        pet.energy = 100
-    end
-    print(pet.name .. " had a good rest!")
+-- Additional test with higher guesses
+guessNumber(25) -- Simulates a guess of 25
+guessNumber(30) -- Simulates a guess of 30
+guessNumber(35) -- Simulates a guess of 35
+
+-- Scenario when the game restarts again
+resetGame() -- Resets the game and starts again
+guessNumber(40) -- New guess after reset
+guessNumber(45) -- Another guess after reset
+
+-- More game state checks
+if gameOver then -- Checks if the game is over again
+    print("This is the end of the game!") -- Prints that the game has finished
+else
+    print("Keep playing to guess the correct number!") -- Encourages to keep guessing
 end
 
-local function agePet()
-    pet.age = pet.age + 1
-    pet.hunger = pet.hunger + 5
-    pet.energy = pet.energy - 10
-    pet.happiness = pet.happiness - 5
-    if pet.hunger >= 100 or pet.happiness <= 0 or pet.energy <= 0 then
-        pet.alive = false
-    end
-end
-
-local function checkStatus()
-    if pet.hunger >= 100 then
-        print(pet.name .. " is starving!")
-    elseif pet.happiness <= 0 then
-        print(pet.name .. " is depressed!")
-    elseif pet.energy <= 0 then
-        print(pet.name .. " has collapsed from exhaustion!")
-    else
-        return
-    end
-end
-
-local function endGame()
-    print("\nUnfortunately, " .. pet.name .. " has passed away.")
-    print("Thank you for playing the Virtual Pet Simulator.")
-    os.exit()
-end
-
-while pet.alive do
-    showStats()
-    print("\nWhat would you like to do?")
-    print("1. Feed " .. pet.name)
-    print("2. Play with " .. pet.name)
-    print("3. Let " .. pet.name .. " rest")
-    print("4. Do nothing (let a day pass)")
-    print("Enter your choice (1-4): ")
-    local choice = io.read("*n")
-
-    if choice == 1 then
-        feedPet()
-    elseif choice == 2 then
-        playWithPet()
-    elseif choice == 3 then
-        restPet()
-    elseif choice == 4 then
-        print("A day passes...")
-    else
-        print("Invalid choice.")
-    end
-
-    agePet()
-    checkStatus()
-
-    if not pet.alive then
-        endGame()
-    end
-end
+-- Final scenario
+guessNumber(50) -- Final guess to close out the game
+print("Thanks for playing our RNG game!") -- Final message to the player
