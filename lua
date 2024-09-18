@@ -1,100 +1,200 @@
-local minValue = 1 -- Sets the minimum value for the random number range
-local maxValue = 100 -- Sets the maximum value for the random number range
-local attempts = 0 -- Initializes attempts counter to zero
-local targetNumber = 0 -- Placeholder for the randomly generated target number
-local maxAttempts = 5 -- The maximum number of attempts allowed
-local gameOver = false -- Boolean to track if the game has ended
+-- Initialize variables
+math.randomseed(os.time()) -- Seeds RNG using current time for better randomness
+player_score = 0 -- Player's starting score
+ai_score = 0 -- AI's starting score
+rounds = 10 -- Total number of rounds
+max_value = 100 -- Maximum value for RNG
+powerups_enabled = true -- Enable or disable powerups
+lives = 3 -- Player has 3 lives
 
-function startGame() -- Defines the function to start the game
-    print("Welcome to the RNG Game!") -- Prints a welcome message
-    print("Guess the number between " .. minValue .. " and " .. maxValue .. "!") -- Concatenates and prints the min and max range
-    targetNumber = math.random(minValue, maxValue) -- Generates a random number between minValue and maxValue
-    attempts = 0 -- Resets the attempt counter to zero
-    gameOver = false -- Resets the gameOver state to false
-    print("You have " .. maxAttempts .. " attempts to guess the number!") -- Informs player of the number of attempts available
+-- Function to play a single round
+function play_round(round_num) -- Takes the current round number as argument
+  print("Round " .. round_num) -- Display the round number
+  player_guess = math.random(1, max_value) -- Player's random guess
+  ai_guess = math.random(1, max_value) -- AI's random guess
+  actual_number = math.random(1, max_value) -- The actual random number
+
+  print("Player guess: " .. player_guess) -- Show player’s guess
+  print("AI guess: " .. ai_guess) -- Show AI’s guess
+  print("Actual number: " .. actual_number) -- Show actual number
+
+  player_diff = math.abs(actual_number - player_guess) -- Player’s difference from actual number
+  ai_diff = math.abs(actual_number - ai_guess) -- AI’s difference from actual number
+
+  if player_diff < ai_diff then -- Check if player is closer
+    print("Player wins this round!") -- Player wins the round
+    player_score = player_score + 1 -- Add to player’s score
+  elseif ai_diff < player_diff then -- Check if AI is closer
+    print("AI wins this round!") -- AI wins the round
+    ai_score = ai_score + 1 -- Add to AI’s score
+  else -- If both are equally close
+    print("It's a tie this round!") -- Declare a tie
+  end
 end
 
-function guessNumber(playerGuess) -- Function to process the player's guess
-    if gameOver then -- Checks if the game is already over
-        print("Game over! Please restart.") -- Prints game over message if game is already finished
-        return -- Stops the function from proceeding further
+-- Main game loop
+for i = 1, rounds do -- Loop for the total number of rounds
+  play_round(i) -- Play a round for each loop iteration
+  print("Current Score - Player: " .. player_score .. " AI: " .. ai_score) -- Display current score
+  print("---------------------------") -- Round divider for clarity
+end
+
+-- Determine and print the final winner
+if player_score > ai_score then -- Check if player has higher score
+  print("Player wins the game with a score of " .. player_score) -- Player wins
+elseif ai_score > player_score then -- Check if AI has higher score
+  print("AI wins the game with a score of " .. ai_score) -- AI wins
+else -- If both have equal scores
+  print("It's a tie game!") -- Game ends in a tie
+end
+
+-- Player input for playing again
+function play_again() -- Define function for replay
+  print("Do you want to play again? (y/n)") -- Ask player
+  local answer = io.read() -- Get input from player
+  if answer == "y" then -- If player says yes
+    player_score = 0 -- Reset player score
+    ai_score = 0 -- Reset AI score
+    for i = 1, rounds do -- Loop to replay rounds
+      play_round(i) -- Replay rounds
+      print("Current Score - Player: " .. player_score .. " AI: " .. ai_score) -- Display updated score
+      print("---------------------------") -- Round divider
     end
-
-    attempts = attempts + 1 -- Increments the attempts counter by 1
-
-    if playerGuess == targetNumber then -- Checks if the player's guess matches the target number
-        print("Congratulations! You've guessed the correct number!") -- Informs player of success if they guessed correctly
-        gameOver = true -- Sets gameOver to true since the player won
-    elseif playerGuess < targetNumber then -- If the guess is lower than the target number
-        print("Your guess is too low!") -- Informs the player that their guess is too low
-    else -- If the guess is higher than the target number
-        print("Your guess is too high!") -- Informs the player that their guess is too high
+    if player_score > ai_score then -- If player wins again
+      print("Player wins the game with a score of " .. player_score) -- Print player win message
+    elseif ai_score > player_score then -- If AI wins again
+      print("AI wins the game with a score of " .. ai_score) -- Print AI win message
+    else -- If it ties again
+      print("It's a tie game!") -- Print tie message
     end
-
-    if attempts >= maxAttempts then -- Checks if the player has reached the maximum number of attempts
-        gameOver = true -- Ends the game if the player used all attempts
-        print("You've used all your attempts! The correct number was " .. targetNumber .. ".") -- Reveals the correct number after all attempts are used
-    end
+    play_again() -- Recursively call the play_again function
+  elseif answer == "n" then -- If player says no
+    print("Thanks for playing!") -- End the game
+  else -- If player input is invalid
+    print("Invalid input, please type 'y' or 'n'") -- Ask again
+    play_again() -- Call function again to ask
+  end
 end
 
-function resetGame() -- Defines a function to reset the game
-    print("Resetting the game...") -- Informs the player that the game is resetting
-    startGame() -- Calls the startGame function to begin a new game
+-- Game End Logic
+play_again() -- Call function to ask if player wants to play again
+
+-- Extra features for game (placeholder)
+function bonus_round() -- Define bonus round function
+  print("Bonus Round Activated!") -- Print message for bonus round
+  bonus_number = math.random(1, max_value * 2) -- Double the max value for RNG
+  player_bonus = math.random(1, max_value * 2) -- Player's bonus guess
+  ai_bonus = math.random(1, max_value * 2) -- AI’s bonus guess
+  print("Player bonus guess: " .. player_bonus) -- Display player’s bonus guess
+  print("AI bonus guess: " .. ai_bonus) -- Display AI’s bonus guess
+  print("Bonus number: " .. bonus_number) -- Show the actual bonus number
+  player_diff = math.abs(bonus_number - player_bonus) -- Calculate player’s difference
+  ai_diff = math.abs(bonus_number - ai_bonus) -- Calculate AI’s difference
+  if player_diff < ai_diff then -- Check if player is closer in bonus round
+    print("Player wins the bonus round!") -- Player wins the bonus round
+    player_score = player_score + 2 -- Add 2 points for player
+  elseif ai_diff < player_diff then -- Check if AI is closer in bonus round
+    print("AI wins the bonus round!") -- AI wins bonus round
+    ai_score = ai_score + 2 -- Add 2 points for AI
+  else -- If both are equally close in bonus round
+    print("Bonus round is a tie!") -- Bonus round ends in tie
+  end
 end
 
--- Main loop for game simulation
-startGame() -- Starts the game when the script runs
-
--- Example guesses below. You can replace these with user input in real use case.
-guessNumber(50) -- Simulates a player guessing 50
-guessNumber(75) -- Simulates a player guessing 75
-guessNumber(88) -- Simulates a player guessing 88
-guessNumber(92) -- Simulates a player guessing 92
-guessNumber(99) -- Simulates a player guessing 99
-
--- Game control and decision logic
-if gameOver then -- If the game is over
-    print("Do you want to play again? (y/n)") -- Asks the player if they want to play again
-    local playerInput = "y" -- Simulates the player inputting 'y'
-    if playerInput == "y" then -- Checks if the player chose to play again
-        resetGame() -- Resets the game if they chose to play again
-    else
-        print("Thanks for playing!") -- Thanks the player and ends the game
-    end
-else
-    print("The game is still in progress...") -- Informs the player that the game is still going
+-- Function for changing difficulty
+function change_difficulty() -- Define difficulty change function
+  print("Select difficulty: Easy, Medium, Hard") -- Present difficulty options
+  difficulty = io.read() -- Get player input
+  if difficulty == "Easy" then -- Easy difficulty selected
+    rounds = 5 -- Reduce number of rounds
+    max_value = 50 -- Lower max value for RNG
+  elseif difficulty == "Medium" then -- Medium difficulty selected
+    rounds = 10 -- Set to default round number
+    max_value = 100 -- Set to default max value
+  elseif difficulty == "Hard" then -- Hard difficulty selected
+    rounds = 15 -- Increase number of rounds
+    max_value = 200 -- Increase max value for RNG
+  else -- If input is invalid
+    print("Invalid difficulty, defaulting to Medium") -- Set to medium by default
+    rounds = 10 -- Default round number
+    max_value = 100 -- Default max value
+  end
 end
 
--- More test cases for player guesses
-guessNumber(5) -- Simulates a guess of 5
-guessNumber(10) -- Simulates a guess of 10
-guessNumber(15) -- Simulates a guess of 15
-guessNumber(20) -- Simulates a guess of 20
 
--- Check game state again
-if gameOver then -- If game is over after these guesses
-    print("Game ended!") -- Prints that the game has ended
-else
-    print("Still going... Keep guessing!") -- Encourages the player to keep guessing
+-- Powerups feature
+function powerup() -- Function for handling powerups
+  local power = math.random(1, 3) -- RNG to decide which powerup to get
+  if power == 1 then
+    print("You gained an extra life!") -- Powerup: Extra life
+    lives = lives + 1 -- Add a life
+  elseif power == 2 then
+    print("Double points activated!") -- Powerup: Double points
+    player_score = player_score * 2 -- Double the player's score
+  elseif power == 3 then
+    print("Steal 2 points from AI!") -- Powerup: Steal points
+    ai_score = math.max(0, ai_score - 2) -- Subtract 2 points from AI
+  end
 end
 
--- Additional test with higher guesses
-guessNumber(25) -- Simulates a guess of 25
-guessNumber(30) -- Simulates a guess of 30
-guessNumber(35) -- Simulates a guess of 35
-
--- Scenario when the game restarts again
-resetGame() -- Resets the game and starts again
-guessNumber(40) -- New guess after reset
-guessNumber(45) -- Another guess after reset
-
--- More game state checks
-if gameOver then -- Checks if the game is over again
-    print("This is the end of the game!") -- Prints that the game has finished
-else
-    print("Keep playing to guess the correct number!") -- Encourages to keep guessing
+-- Function to check for bonus activation
+function bonus_round_trigger() -- Determines if a bonus round is activated
+  if math.random(1, 10) > 8 then -- 20% chance for a bonus round
+    print("Bonus round unlocked!") -- Notify player of bonus round
+    bonus_round() -- Call the bonus round
+  else
+    print("No bonus round this time!") -- No bonus round message
+  end
 end
 
--- Final scenario
-guessNumber(50) -- Final guess to close out the game
-print("Thanks for playing our RNG game!") -- Final message to the player
+-- Health feature
+function lose_life() -- Function to lose a life
+  lives = lives - 1 -- Decrease life count
+  if lives <= 0 then -- Check if lives are depleted
+    print("Game Over! You've lost all your lives!") -- Game over message
+    os.exit() -- Exit the game
+  else
+    print("You have " .. lives .. " lives left.") -- Display remaining lives
+  end
+end
+
+-- Penalty for losing a round
+function round_penalty() -- Apply penalties for losing
+  if player_score < ai_score then -- If player is losing
+    lose_life() -- Player loses a life
+  end
+end
+
+-- Function for end-game surprise
+function end_game_surprise() -- Random surprise at the end of the game
+  surprise = math.random(1, 4) -- 4 possible surprises
+  if surprise == 1 then
+    print("Surprise: Player gets 5 bonus points!") -- Player bonus points
+    player_score = player_score + 5 -- Add 5 points to player
+  elseif surprise == 2 then
+    print("Surprise: AI steals 3 points from player!") -- AI steals points
+    player_score = math.max(0, player_score - 3) -- AI steals 3 points
+  elseif surprise == 3 then
+    print("Surprise: Both scores are reset to 0!") -- Reset scores
+    player_score = 0 -- Reset player score
+    ai_score = 0 -- Reset AI score
+  elseif surprise == 4 then
+    print("Surprise: Extra bonus round!") -- Extra bonus round
+    bonus_round() -- Call bonus round
+  end
+end
+
+-- Call end-game surprise after final round
+end_game_surprise() -- Execute surprise at the end
+
+-- Call difficulty change at game start
+change_difficulty() -- Adjust the game settings based on player input
+
+-- Final game message
+print("Thank you for playing this RNG game!") -- Thank the player
+print("Final Score - Player: " .. player_score .. " AI: " .. ai_score) -- Show the final score
+wait(1)
+print("Remeber to follow me on roblox! :D")
+print(I have youtube channel but is bad "Dystolation")
+wait(1)
+print("Thats basically it...")
